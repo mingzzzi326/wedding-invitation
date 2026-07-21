@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 
 declare global {
-    interface Window { kakao: any; }
+    interface Window {
+        kakao: any; // 지도 API용
+        Kakao: any; // 공유 SDK용
+    }
 }
 
 const Map = () => {

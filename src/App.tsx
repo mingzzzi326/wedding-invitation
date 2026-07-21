@@ -126,14 +126,55 @@ function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const handleShare = () => {
+  const initKakao = () => {
+    if (window.Kakao && !window.Kakao.isInitialized()) {
+      window.Kakao.init('YOUR_JAVASCRIPT_KEY_HERE'); // 본인의 JS 키
+    }
+  };
+  const handleShare = async () => {
+    const shareData = {
+      title: '희민 & 혜경 결혼합니다',
+      url: window.location.href,
+    };
+
+    // 1. Web Share API 시도 (모바일 사파리, 크롬 등)
     if (navigator.share) {
-      navigator.share({
-        title: '희민 & 혜경 결혼합니다',
-        url: window.location.href,
-      }).catch(console.error);
+      try {
+        await navigator.share(shareData);
+        return; // 성공 시 종료
+      } catch (err) {
+        console.error('공유 실패, 카카오톡 공유로 전환합니다.');
+      }
+    }
+
+    // 2. Web Share API 실패 시 카카오톡 SDK 시도
+    initKakao();
+    if (window.Kakao && window.Kakao.Share) {
+      window.Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '희민 & 혜경 결혼합니다',
+          description: '소중한 분들을 초대합니다.',
+          imageUrl: 'https://mingzzzi326.github.io/wedding-invitation/thumbnail.jpg', // https:// 필수
+          link: {
+            mobileWebUrl: window.location.href,
+            webUrl: window.location.href,
+          },
+        },
+        buttons: [
+          {
+            title: '청첩장 보기',
+            link: {
+              mobileWebUrl: window.location.href,
+              webUrl: window.location.href,
+            },
+          },
+        ],
+      });
     } else {
-      alert('이 브라우저는 공유하기 기능을 지원하지 않습니다.');
+      // 3. 둘 다 안될 경우 클립보드 복사
+      await navigator.clipboard.writeText(window.location.href);
+      alert('링크가 복사되었습니다!');
     }
   };
 
