@@ -126,55 +126,56 @@ function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  //카카오 공유하기
   const initKakao = () => {
-    if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init('974855566611c12e7a747b29d5a6bb1b'); // 본인의 JS 키
+    const kakao = (window as any).Kakao; // 캐스팅
+    if (kakao && !kakao.isInitialized()) {
+      kakao.init('974855566611c12e7a747b29d5a6bb1b');
     }
   };
   const handleShare = async () => {
-    const shareData = {
-      title: '희민 & 혜경 결혼합니다',
-      url: window.location.href,
-    };
+    // 1. SDK 초기화
+    initKakao();
+    const kakao = (window as any).Kakao;
 
-    // 1. Web Share API 시도 (모바일 사파리, 크롬 등)
-    if (navigator.share) {
+    // 2. PC 환경에서 intent 에러가 발생하는 것을 방지하는 체크
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isKakaoSupported = isMobile && kakao && kakao.Share;
+
+    if (isKakaoSupported) {
       try {
-        await navigator.share(shareData);
-        return; // 성공 시 종료
+        kakao.Share.sendCustom({
+          templateId: 135497,
+        });
+        return;
       } catch (err) {
-        console.error('공유 실패, 카카오톡 공유로 전환합니다.');
+        console.log('카카오 공유 실패, 기본 공유로 이동');
       }
     }
 
-    // 2. Web Share API 실패 시 카카오톡 SDK 시도
-    initKakao();
-    if (window.Kakao && window.Kakao.Share) {
-      window.Kakao.Share.sendDefault({
-        objectType: 'feed',
-        content: {
-          title: '희민 & 혜경 결혼합니다',
-          description: '소중한 분들을 초대합니다.',
-          imageUrl: 'https://mingzzzi326.github.io/wedding-invitation/thumbnail.jpg', // https:// 필수
-          link: {
-            mobileWebUrl: window.location.href,
-            webUrl: window.location.href,
-          },
-        },
-        buttons: [
-          {
-            title: '청첩장 보기',
-            link: {
-              mobileWebUrl: window.location.href,
-              webUrl: window.location.href,
-            },
-          },
-        ],
-      });
-    } else {
-      // 3. 둘 다 안될 경우 클립보드 복사
+    // 2단계: 카카오 공유 실패 시 Web Share API 시도
+    const shareData = {
+      title: '희민 & 혜경 결혼합니다',
+      text: '소저희의 새로운 시작을 함께해 주세요',
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        console.warn('기본 공유 실패, 클립보드 복사로 전환합니다.');
+      }
+    }
+
+    // 3단계: 마지막 수단 (클립보드 복사)
+    try {
       await navigator.clipboard.writeText(window.location.href);
-      alert('링크가 복사되었습니다!');
+      alert('링크가 클립보드에 복사되었습니다!');
+    } catch (err) {
+      alert('공유 기능을 사용할 수 없는 환경입니다. 주소를 직접 복사해주세요.');
     }
   };
 
