@@ -1,0 +1,714 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Script&family=Meddon&family=Mrs+Saint+Delafield&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400&family=Nanum+Myeongjo:wght@400;700&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+:root {
+  --bg-pastel: #FCFAF8; /*캔바 특유의 아주 밝고 따뜻한 크림톤 */
+  --point-pink: #E8D5D8;
+  --text-main: #3A3432;
+  --text-sub: #8B8280;
+  --line-color: #EFEAE6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  /* PC 화면일 때 캔버스(배경) 역할을 할 부드러운 웜그레이 색상 */
+  background-color: #F2EFEA;
+  color: var(--text-main);
+  font-family: 'Pretendard', sans-serif;
+  line-height: 1.6;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased; /* 글씨를 더 선명하고 얇게 처리 */
+}
+
+.serif { font-family: 'Nanum Myeongjo', serif; }
+
+/* 📱 모바일 기본: 캔바처럼 화면에 딱 붙는 꽉 찬 레이아웃 */
+.wrap {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  text-align: center;
+  padding-bottom: 80px;
+
+  /* 배경 설정 */
+  background-size: cover;
+  background: linear-gradient(rgba(252, 250, 248, 0.50), rgba(252, 250, 248, 0.50)), url('./assets/background.jpg') no-repeat fixed center;
+
+  /* 기존 애니메이션 */
+  transition: max-width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+  border-radius 0.4s ease,
+  box-shadow 0.4s ease,
+  margin 0.4s ease;
+}
+
+section {
+  padding: 80px 15px; /* 여백을 넓혀 캔바의 시원한 느낌 강조 */
+  border-bottom: 1px solid var(--line-color);
+}
+section:last-child { border-bottom: none; }
+
+.cover {
+  padding: 0 !important; /* cover 섹션은 패딩을 없애고 내부 요소들이 알아서 패딩을 갖게 함 */
+  border-bottom: 1px solid var(--line-color);
+}
+/* 커버 섹션: 화면에 더 시원하게 꽉 차도록 설정 */
+.cover-video-section {
+  width: 100% !important;
+  height: 150vh; /* 화면의 60% 차지 */
+  overflow: hidden;
+  padding: 0;
+  border-bottom: none;
+}
+
+.cover-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 정보 섹션: 영상 바로 아래 배치 */
+.cover-info-section {
+  width: 100%;
+  padding: 60px 20px;
+  background-color: var(--bg-pastel); /* 배경색을 넣어 분리 강조 */
+  text-align: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: var(--text-main); /* 흰색에서 다시 기본 텍스트 색으로 */
+}
+
+.date {
+  color: var(--text-sub);
+}
+
+.section-title { font-size: 1.15rem; color: var(--text-sub); letter-spacing: 4px; margin-bottom: 40px; font-weight: bold; }
+.greeting-text { font-size: 1rem; line-height: 2.4; margin-bottom: 50px; }
+.parents-info { font-size: 1rem; line-height: 2.2; }
+.parents-info span { color: var(--text-sub); font-size: 0.9rem; margin-right: 8px; }
+
+.account { padding: 80px 25px; }
+.account-desc { font-size: 0.95rem; color: var(--text-sub); margin-bottom: 30px; }
+.btn-toggle {
+  width: 100%; padding: 18px; background-color: #FFFFFF;
+  border: 1px solid var(--line-color); border-radius: 12px;
+  color: var(--text-main); font-size: 1rem; cursor: pointer;
+  display: flex; justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02); /* 버튼에도 미세한 입체감 */
+  transition: background-color 0.2s ease;
+}
+.btn-toggle:active { background-color: #F8F5F2; }
+
+.account-details {
+  margin-top: 10px; padding: 20px; background-color: #FAF8F5;
+  border-radius: 12px; text-align: left; font-size: 0.95rem;
+  border: 1px solid var(--line-color);
+}
+.bank-flex { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.btn-copy {
+  padding: 6px 14px; background-color: var(--point-pink);
+  color: var(--text-main); border: none; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+}
+
+
+/* =======================================================
+ ✨ 스크롤 페이드인 애니메이션 효과
+ ======================================================= */
+.fade-in {
+  opacity: 0; /* 처음에는 투명하게 숨김 */
+  transform: translateY(30px); /* 원래 위치보다 30px 아래로 내려놓음 */
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out; /* 0.8초 동안 부드럽게 변함 */
+}
+
+.fade-in.visible {
+  opacity: 1; /* 화면에 보이면 투명도 100% */
+  transform: translateY(0); /* 원래 위치로 스르륵 올라옴 */
+}
+
+/* =======================================================
+   💻 태블릿 & PC 데스크탑용 반응형 디자인
+   ======================================================= */
+@media screen and (min-width: 768px) {
+  .wrap {
+    /* PC에서는 카드가 공중에 예쁘게 떠 있는 캔바 느낌 */
+    margin: 6vh auto;
+    border-radius: 24px;
+
+    /* 그림자를 여러 겹 쌓아서 훨씬 깊고 부드러운 입체감 생성 */
+    box-shadow:
+            0 20px 40px -10px rgba(0,0,0,0.05),
+            0 10px 20px -5px rgba(0,0,0,0.03),
+            0 0 0 1px rgba(0,0,0,0.02);
+
+    overflow: hidden;
+  }
+
+  /*PC 화면일 때 커버 사진 높이 고정*/
+  .cover-img-wrap {
+    height: 700px;
+  }
+
+}
+
+/* 달력 컨테이너: 좁은 화면에서도 7열 그리드 유지 */
+.calendar {
+  margin: 30px auto;
+  width: 100%;
+  max-width: 320px;
+  display: block !important;
+}
+
+/* 요일과 날짜 그리드: 화면이 줄어도 7열 고정 */
+.cal-header,
+.cal-body {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important; /* 7열 유지 핵심 */
+  gap: 8px !important;
+  width: 100% !important;
+  justify-items: center; /* 숫자/요일을 칸의 정중앙에 배치 */
+  align-items: center;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 요일 칸과 날짜 칸을 명확히 정의 */
+.cal-header span,
+.cal-body div {
+  width: 100%;
+  height: 30px;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem !important;
+}
+
+/* 24일 강조 디자인 */
+.cal-body .active {
+  background-color: #333;
+  color: #fff;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+}
+
+.countdown { margin-top: 40px; font-size: 0.9rem; color: #777; }
+.time-box { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+.time-box span { display: flex; flex-direction: column; font-size: 0.7rem; color: #999; }
+.time-box b { font-size: 1.2rem; color: #333; }
+
+/* 갤러리 그리드 */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
+  gap: 10px;
+}
+.gallery-grid img {
+  width: 100%;
+  aspect-ratio: 1/1; /* 정사각형 비율 */
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 확대 모달 */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 80%;
+  object-fit: contain;
+
+  transition: opacity 0.4s ease-in-out;
+  opacity: 1;
+}
+.modal img.fade-out {
+  opacity: 0;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 15px;
+  z-index: 100;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+}
+.nav-btn:hover {
+  opacity: 1;
+}
+.nav-btn::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid white;
+  border-right: 2px solid white;
+  box-shadow: none;
+}
+.prev {
+  left: 10px;
+}
+.prev::before {
+  transform: rotate(-135deg);
+  margin-left: 5px;
+}
+.next {
+  right: 10px;
+}
+.next::before {
+  transform: rotate(45deg);
+  margin-right: 5px;
+}
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+/* 지도 */
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.map-btn {
+  padding: 10px 20px;
+  border: 1px solid #d1d1d1; /* 얇고 연한 테두리 */
+  border-radius: 20px;      /* 둥근 형태 */
+  font-size: 0.85rem;
+  color: #555;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.map-btn:hover {
+  background: #f8f8f8;
+  border-color: #aaa;
+  color: #333;
+}
+
+.traffic-info {
+  text-align: left; /* 정보는 왼쪽 정렬이 읽기 좋습니다 */
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.8;
+  padding: 0 20px;
+}
+
+.traffic-info h3 {
+  font-family: 'Nanum Myeongjo', serif;
+  font-size: 1rem;
+  margin: 20px 0 8px 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+/* 지하철 아이콘은 파란 계열, 버스는 초록 계열 등으로 포인트 */
+.traffic-info h3 svg {
+  color: #8B8280; /* 기본 아이콘 색상 */
+  font-size: 1.1rem;
+}
+
+.traffic-info p {
+  margin-bottom: 4px;
+}
+
+.traffic-info .notice {
+  font-size: 0.8rem;
+  color: #d9534f; /* 주의사항은 붉은 계열로 강조 */
+  margin-bottom: 10px;
+}
+
+.guestbookn{
+  padding: 80px 25px;
+}
+
+/* 방명록 */
+/* ====================================
+   방명록 작성 폼 (메인 노출)
+==================================== */
+.guestbook-form {
+  margin-bottom: 30px;
+  background-color: transparent;
+}
+
+.form-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-inputs input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #EFEAE6;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.form-inputs input:focus,
+.guestbook-form textarea:focus {
+  border-color: #c9c9c9;
+}
+
+.guestbook-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #EFEAE6;
+  border-radius: 6px;
+  height: 80px;
+  resize: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #3A3432; /* 진회색 */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/*
+   방명록 리스트 & 아이템
+*/
+.guestbook-item {
+  background-color: #fff;
+  border: 1px solid #EFEAE6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-right .date {
+  color: #8B8280;
+  font-size: 0.85rem;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #c9c9c9;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.btn-delete:hover {
+  color: #3A3432;
+}
+
+.guestbook-item .message {
+  font-size: 0.95rem;
+  color: #3A3432;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* 전체보기 버튼 (메인) */
+.btn-view-all {
+  width: 100%;
+  padding: 14px;
+  background-color: #fff;
+  color: #3A3432;
+  border: 1px solid #EFEAE6;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* 모달 공통 및 전체보기 전용 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #EFEAE6;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: normal;
+  color: #555;
+  margin: 0 auto;
+  padding-left: 24px; /* 중앙 정렬 보정 */
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.modal-body.scrollable {
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 모달 내 방명록 없을 때 (Empty State) */
+.empty-state {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.empty-state p {
+  color: #888;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.btn-empty-write {
+  padding: 10px 24px;
+  background-color: #fff;
+  color: #555;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* 페이징 버튼 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #EFEAE6;
+  background-color: #fff;
+  color: #8B8280;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.pagination button.active {
+  background-color: #3A3432;
+  color: #fff;
+  border-color: #3A3432;
+}
+
+/*프로필*/
+.profile-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.profile-box {
+  flex: 1;
+  text-align: center;
+}
+
+.profile-img {
+  width: 100%;
+  max-width: 200px; /* 사진 크기 조절 */
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 5px; /* 사진 모양(둥근 사각형) */
+  margin: 0 auto 15px auto;
+  box-shadow: 0 5px 13px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.profile-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.profile-detail {
+  font-size: 0.9rem;
+  color: #777;
+  line-height: 1.6;
+}
+
+/* 색상 구분 */
+.groom-color { color: #7da5c9; margin-right: 5px; font-size: 1.0rem;}
+.bride-color { color: #d698a9; margin-right: 5px; font-size: 1.0rem;}
+
+
+/* 마무리: D-day */
+.together-section {
+  padding: 80px 24px 60px;
+  text-align: center;
+  border-bottom: none;
+}
+
+.together-title {
+  font-size: 0.95rem;
+  color: #8B8280;
+  margin-bottom: 24px;
+}
+
+.together-time {
+  font-size: 1.1rem;
+  color: #555;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* 마무리: 마지막 꽉 찬 사진 */
+.closing-image-section {
+  padding: 0;
+  border-bottom: none;
+  margin: 0 auto; /* 가운데 정렬 */
+  width: 100%;
+  max-width: 480px; /* 너비 480px에 딱 맞추기 */
+}
+
+.closing-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* 화면의 70% 정도를 덮도록 설정 */
+  overflow: hidden;
+}
+
+.closing-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 네비게이션 */
+.floating-buttons {
+  position: fixed;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+
+  /* 모바일 화면 기본 위치 */
+  right: 20px;
+}
+/* PC/태블릿 화면 (480px 이상)일 때 버튼 위치 보정 */
+@media (min-width: 450px) {
+  .floating-buttons {
+    right: calc(50% - 240px + 20px);
+  }
+}
+
+.float-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(140, 130, 125, 0.4); /* 고급스러운 반투명 웜그레이 */
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px); /* 배경을 살짝 흐리게 처리 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+  font-size: 1.2rem; /* react-icons 크기 조절 */
+}
+
+.float-btn:hover {
+  background-color: rgba(140, 130, 125, 0.6);
+}
+
+.copyright {
+  text-align: center;
+  padding: 40px 20px 60px; /* 마지막 섹션과의 여백 및 하단 여유 공간 */
+  font-size: 0.75rem; /* 작고 앙증맞은 폰트 크기 */
+  color: #8BA2B5; /* 첨부 이미지와 유사한 은은한 블루그레이 톤 */
+  background-color: transparent;
+  letter-spacing: 0.5px; /* 글자 사이 간격을 살짝 넓혀서 깔끔하게 */
+  font-family: Arial, Helvetica, sans-serif; /* 영문이 예쁘게 나오는 기본 폰트 적용 */
+}
