@@ -128,7 +128,7 @@ function App() {
   };
   const initKakao = () => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
-      window.Kakao.init('YOUR_JAVASCRIPT_KEY_HERE'); // 본인의 JS 키
+      window.Kakao.init('974855566611c12e7a747b29d5a6bb1b'); // 본인의 JS 키
     }
   };
   const handleShare = async () => {
