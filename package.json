@@ -2,7 +2,7 @@
   "name": "hh-wedding-invitation",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://mingzzzi326.github.io/wedding-invitation",
+  "homepage": "https://mingzzzi326.github.io/wedding-invitation/",
   "type": "module",
   "scripts": {
     "dev": "vite",
