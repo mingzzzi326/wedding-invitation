@@ -3,29 +3,30 @@ import { db } from './firebase';
 import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'firebase/firestore';
 import './App.css'
 import Map from './map.tsx';
-import mainVideo from './assets/main-video.mp4';
 //아이콘
 import { FaSubway, FaBus, FaShuttleVan } from 'react-icons/fa';
 //네비게이션
 import { FaShareAlt, FaArrowUp } from 'react-icons/fa';
-// 사진
-/*import mainPhoto from './assets/main.jpg';*/
-import photo1 from './assets/photo1.jpg';
-import photo2 from './assets/photo2.jpg';
-import photo3 from './assets/photo3.jpg';
-import photo4 from './assets/photo4.jpg';
-import photo5 from './assets/photo5.jpg';
-import photo6 from './assets/photo6.jpg';
-import photo7 from './assets/photo7.jpg';
-import photo8 from './assets/photo8.jpg';
-/*import groomPic from './assets/groom.jpg';
-import bridePic from './assets/bride.jpg';*/
 
 function App() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isGroomAccountOpen, setIsGroomAccountOpen] = useState<boolean>(false);
   const [isBrideAccountOpen, setIsBrideAccountOpen] = useState<boolean>(false);
-  const photoList = [photo1, photo2, photo3, photo4, photo5, photo6, photo7, photo8];
+
+  const photoList = [
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00515_onzpdl.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00086_fpconh.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00579_t0kk8m.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00605_s9qdo7.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00783_tjdahw.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00803_ip0cqs.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01038_1_suporu.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01213_1_cxlylw.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_01_qqjl12.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_s7tofm.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00261_dmjpqm.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00699_kzpqeq.jpg"
+  ];
 
   //갤러리
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
@@ -269,8 +270,13 @@ function App() {
                 muted
                 loop
                 playsInline
+                controls={false}  // 버튼 노출 강제 차단
+                preload="auto"    // 미리 로드해서 로딩 중 버튼 노출 방지
             >
-              <source src={mainVideo} type="video/mp4" />
+              <source
+                  src="https://res.cloudinary.com/g2ipdqwy/video/upload/v1784990747/main-video_kh7rvn.mp4"
+                  type="video/mp4"
+              />
             </video>
           </div>
 
@@ -295,8 +301,8 @@ function App() {
           <div className="profile-container fade-in">
             {/* 신랑 */}
             <div className="profile-box">
-{/*              <img src="" alt="신랑" className="profile-img" />*/}
-              <div className="img-placeholder profile-img">IMAGE</div> {/* 사진 대신 회색 박스 */}
+              <img src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784991891/1_dciy8f.png" alt="신랑" className="profile-img" />
+              {/*<div className="img-placeholder profile-img">IMAGE</div>  사진 대신 회색 박스 */}
               <p className="profile-title">
                 <span className="groom-color">신랑</span> 이희민
               </p>
@@ -305,8 +311,8 @@ function App() {
 
             {/* 신부 */}
             <div className="profile-box">
-{/*              <img src="" alt="신부" className="profile-img" />*/}
-              <div className="img-placeholder profile-img">IMAGE</div> {/* 사진 대신 회색 박스 */}
+             <img src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784991891/2_x8f57u.png" alt="신부" className="profile-img" />
+{/*              <div className="img-placeholder profile-img">IMAGE</div>  사진 대신 회색 박스 */}
               <p className="profile-title">
                 <span className="bride-color">신부</span> 이혜경
               </p>
@@ -572,7 +578,7 @@ function App() {
         <section className="closing-image-section fade-in">
           <div className="closing-wrapper">
             {/* 💡 마지막으로 들어갈 예쁜 사진 경로로 변경해 주세요 */}
-            <img src={photo8} alt="행복하게 잘 살겠습니다" className="closing-image" />
+            <img src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_02_w51kho.jpg" alt="행복하게 잘 살겠습니다" className="closing-image" />
           </div>
         </section>
 
