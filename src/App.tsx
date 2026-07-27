@@ -175,7 +175,7 @@ function App() {
     // 2단계: 카카오 공유 실패 시 Web Share API 시도
     const shareData = {
       title: '희민 & 혜경 결혼합니다',
-      text: '소저희의 새로운 시작을 함께해 주세요',
+      text: '저희의 새로운 시작을 함께해 주세요',
       url: window.location.href,
     };
 
