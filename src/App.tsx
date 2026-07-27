@@ -482,7 +482,7 @@ function App() {
                 <p><strong>국민은행</strong> 620002-04-125116</p>
                 <div className="bank-flex">
                   <span>예금주 : 이희민</span>
-                  <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
+                  <button className="btn-copy" onClick={() => copyText('62000204125116')}>복사</button>
                 </div>
               </div>
           )}
@@ -496,7 +496,7 @@ function App() {
                 <p><strong>국민은행</strong> 318002-04-150552</p>
                 <div className="bank-flex">
                   <span>예금주 : 이혜경</span>
-                  <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
+                  <button className="btn-copy" onClick={() => copyText('31800204150552')}>복사</button>
                 </div>
               </div>
           )}

@@ -409,7 +409,7 @@ function ParentApp() {
 
                 {/* 사진이 8장보다 많고, 아직 다 펼치지 않았을 때만 버튼 노출 */}
                 {!showAll && photoList.length > 8 && (
-                    <button className="more-btn" onClick={() => setShowAll(true)}>
+                    <button className="more-btn fade-in" onClick={() => setShowAll(true)}>
                         사진 더보기 +
                     </button>
                 )}
@@ -487,14 +487,14 @@ function ParentApp() {
                             <p><strong>신한은행</strong> 110-004-756070</p>
                             <div className="bank-flex">
                                 <span>예금주 : 이득선</span>
-                                <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('110004756070')}>복사</button>
                             </div>
                         </div>
                         <div className="account-details">
                             <p><strong>농협은행</strong> 177074-56-129421</p>
                             <div className="bank-flex">
                                 <span>예금주 : 김해례</span>
-                                <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('17707456129421')}>복사</button>
                             </div>
                         </div>
                     </>
@@ -508,17 +508,17 @@ function ParentApp() {
                 {isBrideAccountOpen && (
                     <>
                         <div className="account-details">
-                            <p><strong>국민은행</strong> 288002-04-019125</p>
+                            <p><strong>국민은행</strong> 202-21-0766-895</p>
                             <div className="bank-flex">
                                 <span>예금주 : 이흥배</span>
-                                <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('202210766895')}>복사</button>
                             </div>
                         </div>
                         <div className="account-details">
                             <p><strong>국민은행</strong> 288002-04-019125</p>
                             <div className="bank-flex">
                                 <span>예금주 : 오민자</span>
-                                <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('28800204019125')}>복사</button>
                             </div>
                         </div>
                     </>
