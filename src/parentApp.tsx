@@ -1,0 +1,678 @@
+import {useState, useRef, useEffect} from 'react'
+import {db} from './firebase';
+import {collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'firebase/firestore';
+import './parentApp.css'
+import Map from './map.tsx';
+//아이콘
+import {FaSubway, FaBus, FaShuttleVan} from 'react-icons/fa';
+//네비게이션
+import {FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute} from 'react-icons/fa';
+
+function ParentApp() {
+
+    const [timeLeft, setTimeLeft] = useState({days: 0, hours: 0, minutes: 0, seconds: 0});
+    const [isGroomAccountOpen, setIsGroomAccountOpen] = useState<boolean>(false);
+    const [isBrideAccountOpen, setIsBrideAccountOpen] = useState<boolean>(false);
+
+    const photoList = [
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00515_onzpdl.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00086_fpconh.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00579_t0kk8m.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00605_s9qdo7.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00783_tjdahw.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00803_ip0cqs.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00699_kzpqeq.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00261_dmjpqm.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_01_qqjl12.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_s7tofm.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01213_1_cxlylw.jpg",
+        "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01038_1_suporu.jpg"
+    ];
+    const [showAll, setShowAll] = useState(false);
+
+    const displayedPhotos = showAll ? photoList : photoList.slice(0, 7);
+    //갤러리
+    const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+    // 갤러리 - 버튼 클릭 시 인덱스 조절 함수
+    const handlePrev = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev !== null ? (prev - 1 + photoList.length) % photoList.length : null));
+    };
+
+// 음악 재생 상태 관리
+    const [isPlaying, setIsPlaying] = useState(false);
+    // Audio 객체 생성 (CDN 주소를 여기에 입력하세요)
+    const audioRef = useRef(new Audio("https://res.cloudinary.com/g2ipdqwy/video/upload/v1785050702/paulyudin-story-160693_g7vavm.mp3"));
+    const toggleAudio = () => {
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleNext = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // 1. 이미지를 먼저 투명하게(사라지게)
+        const imgElement = document.querySelector('.modal img');
+        imgElement?.classList.add('fade-out');
+        // 2. 0.3초 뒤에 사진을 교체하고 다시 나타나게
+        setTimeout(() => {
+            setCurrentIndex((prev) => (prev !== null ? (prev + 1) % photoList.length : null));
+            imgElement?.classList.remove('fade-out');
+        }, 300);
+    };
+
+    //방명록
+    const [entries, setEntries] = useState<any[]>([]);
+    const [isAllModalOpen, setIsAllModalOpen] = useState(false);
+    const [name, setName] = useState('');
+    const [message, setMessage] = useState('');
+    const [password, setPassword] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const formatDate = (dateObj: any) => {
+        if (!dateObj) return '';
+        if (dateObj.seconds) return new Date(dateObj.seconds * 1000).toLocaleDateString();
+        return new Date(dateObj).toLocaleDateString();
+    };
+    const fetchEntries = async () => {
+        try {
+            const q = query(collection(db, "guests"), orderBy("date", "desc"));
+            const data = await getDocs(q);
+            setEntries(data.docs.map(doc => ({...doc.data(), id: doc.id})));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const handleSubmit = async () => {
+        if (!name || !message || !password) {
+            alert('이름, 내용, 비밀번호를 모두 입력해주세요!');
+            return;
+        }
+        try {
+            await addDoc(collection(db, "guests"), {name, message, password, date: new Date()});
+            setName('');
+            setMessage('');
+            setPassword('');
+            fetchEntries();
+        } catch (error) {
+            alert("등록에 실패했습니다.");
+        }
+    };
+    const handleDelete = async (id: string, entryPassword: string) => {
+        const inputPassword = window.prompt("삭제하시려면 비밀번호를 입력해주세요.");
+        if (inputPassword === null) return;
+        if (inputPassword === entryPassword) {
+            try {
+                await deleteDoc(doc(db, "guests", id));
+                alert("삭제되었습니다.");
+                fetchEntries();
+            } catch (error) {
+                alert("삭제에 실패했습니다.");
+            }
+        } else {
+            alert("비밀번호가 일치하지 않습니다.");
+        }
+    };
+    // 페이징 계산 로직
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = entries.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(entries.length / itemsPerPage);
+
+    //지하철 icon
+    const LineIcon = ({line, color}: { line: string, color: string }) => (
+        <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            backgroundColor: color,
+            color: 'white',
+            fontSize: '0.8rem',
+            fontWeight: 'bold',
+            marginRight: '6px'
+        }}>
+    {line}
+    </span>
+    );
+
+    // 네비게이션 bar
+    const scrollToTop = () => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+
+    //카카오 공유하기
+    const initKakao = () => {
+        const kakao = (window as any).Kakao; // 캐스팅
+        if (kakao && !kakao.isInitialized()) {
+            kakao.init('974855566611c12e7a747b29d5a6bb1b');
+        }
+    };
+    const handleShare = async () => {
+        // 1. SDK 초기화
+        initKakao();
+        const kakao = (window as any).Kakao;
+
+        // 2. PC 환경에서 intent 에러가 발생하는 것을 방지하는 체크
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isKakaoSupported = isMobile && kakao && kakao.Share;
+
+        if (isKakaoSupported) {
+            try {
+                kakao.Share.sendCustom({
+                    templateId: 135497,
+                });
+                return;
+            } catch (err) {
+                console.log('카카오 공유 실패, 기본 공유로 이동');
+            }
+        }
+
+        // 2단계: 카카오 공유 실패 시 Web Share API 시도
+        const shareData = {
+            title: '희민 & 혜경 결혼합니다',
+            text: '소저희의 새로운 시작을 함께해 주세요',
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                return;
+            } catch (err) {
+                console.warn('기본 공유 실패, 클립보드 복사로 전환합니다.');
+            }
+        }
+
+        // 3단계: 마지막 수단 (클립보드 복사)
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            alert('링크가 클립보드에 복사되었습니다!');
+        } catch (err) {
+            alert('공유 기능을 사용할 수 없는 환경입니다. 주소를 직접 복사해주세요.');
+        }
+    };
+
+    //마지막 - 함께한 시간 section
+    const [elapsedTime, setElapsedTime] = useState({years: 0, days: 0, hours: 0, minutes: 0, seconds: 0});
+
+    useEffect(() => {
+        //방명록 불러오기
+        fetchEntries();
+
+        // 1. 스크롤 감지 Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        const fadeElements = document.querySelectorAll('.fade-in');
+        fadeElements.forEach((el) => observer.observe(el));
+
+        const handleContextMenu = (e: MouseEvent) => {
+            // 우클릭한 대상이 이미지(HTMLImageElement)인 경우에만 차단
+            if (e.target instanceof HTMLImageElement) {
+                e.preventDefault();
+            }
+        };
+
+        // 마우스 우클릭 이벤트 리스너 추가
+        document.addEventListener('contextmenu', handleContextMenu);
+
+        // 2. 카운트다운 타이머
+        const weddingDate = new Date('2026-10-24T11:00:00');
+        const countdownTimer = setInterval(() => {
+            const now = new Date();
+            const diff = weddingDate.getTime() - now.getTime();
+
+            if (diff <= 0) {
+                setTimeLeft({days: 0, hours: 0, minutes: 0, seconds: 0});
+                clearInterval(countdownTimer);
+            } else {
+                setTimeLeft({
+                    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((diff / 1000 / 60) % 60),
+                    seconds: Math.floor((diff / 1000) % 60)
+                });
+            }
+        }, 1000);
+
+        const startDate = new Date('2023-11-20T00:00:00');
+
+        const elapsedTimer = setInterval(() => {
+            const now = new Date();
+            let diff = now.getTime() - startDate.getTime();
+
+            // 시간 계산 (윤년 대략적 고려)
+            const msPerYear = 1000 * 60 * 60 * 24 * 365.25;
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const msPerHour = 1000 * 60 * 60;
+            const msPerMinute = 1000 * 60;
+            const years = Math.floor(diff / msPerYear);
+            diff -= years * msPerYear;
+            const days = Math.floor(diff / msPerDay);
+            diff -= days * msPerDay;
+            const hours = Math.floor(diff / msPerHour);
+            diff -= hours * msPerHour;
+            const minutes = Math.floor(diff / msPerMinute);
+            diff -= minutes * msPerMinute;
+            const seconds = Math.floor(diff / 1000);
+            setElapsedTime({years, days, hours, minutes, seconds});
+        }, 1000);
+
+        return () => {
+            clearInterval(countdownTimer); // 카운트다운 타이머 종료
+            clearInterval(elapsedTimer);   // 함께한 시간 타이머 종료
+            fadeElements.forEach((el) => observer.unobserve(el));
+        };
+    }, []);
+
+    const copyText = (text: string): void => {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('계좌번호가 복사되었습니다.');
+        });
+    };
+
+    return (
+        <div className="wrap parent-mode">
+            {/* 1. 메인 커버 섹션 */}
+            <section className="cover">
+                {/* 1. 영상 섹션 (상단) */}
+                <div className="cover-video-section">
+                    <video
+                        className="cover-video"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        controls={false}  // 버튼 노출 강제 차단
+                        preload="auto"    // 미리 로드해서 로딩 중 버튼 노출 방지
+                    >
+                        <source
+                            src="https://res.cloudinary.com/g2ipdqwy/video/upload/v1784990747/main-video_kh7rvn.mp4"
+                            type="video/mp4"
+                        />
+                    </video>
+                </div>
+
+                {/* 2. 정보 섹션 (영상 아래) */}
+                <div className="cover-info-section fade-in">
+                    <h1 className="title serif">희민 & 혜경</h1>
+                    <p className="date">2026. 10. 24. SAT AM 11:00<br/>서울 중구 마른내로 71 호텔PJ</p>
+                </div>
+            </section>
+
+            {/* 2. 인사말 섹션 */}
+            <section className="greeting">
+                <h2 className="section-title serif fade-in">초대합니다</h2>
+                <p className="greeting-text serif fade-in">
+                    서로가 마주 보며 다져온 사랑을<br/>
+                    이제 함께 한 곳을 바라보며<br/>
+                    걸어갈 수 있는 큰 사랑으로 키우고자 합니다.<br/><br/>
+                    따뜻한 파스텔빛 가을날,<br/>
+                    저희 두 사람의 출발을<br/>
+                    축복해 주시면 감사하겠습니다.
+                </p>
+                <div className="profile-container fade-in">
+                    {/* 신랑 */}
+                    <div className="profile-box">
+                        <img src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784991891/1_dciy8f.png" alt="신랑"
+                             className="profile-img"/>
+                        {/*<div className="img-placeholder profile-img">IMAGE</div>  사진 대신 회색 박스 */}
+                        <p className="profile-title">
+                            <span className="groom-color">신랑</span> 이희민
+                        </p>
+                        <p className="profile-detail">이득선 · 김해례 의 장남</p>
+                    </div>
+
+                    {/* 신부 */}
+                    <div className="profile-box">
+                        <img src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784991891/2_x8f57u.png" alt="신부"
+                             className="profile-img"/>
+                        {/*              <div className="img-placeholder profile-img">IMAGE</div>  사진 대신 회색 박스 */}
+                        <p className="profile-title">
+                            <span className="bride-color">신부</span> 이혜경
+                        </p>
+                        <p className="profile-detail">이흥배 · 오민자 의 장녀</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* 3. 달력 & 카운트다운 섹션 */}
+            <section className="calendar-section">
+                <h2 className="section-title serif fade-in">10월</h2>
+                <div className="calendar fade-in">
+                    <div className="cal-header">
+                        <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                    </div>
+                    <div className="cal-body">
+                        {Array.from({length: 4}).map((_, i) => (
+                            <div key={`empty-${i}`}></div>
+                        ))}
+                        {Array.from({length: 31}).map((_, i) => (
+                            <div key={i} className={i + 1 === 24 ? 'active' : ''}>{i + 1}</div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="countdown fade-in">
+                    <p>희민 ❤ 혜경 결혼식까지</p>
+                    <div className="minimal-grid">
+                        {[
+                            {val: timeLeft.days, label: 'DAYS'},
+                            {val: timeLeft.hours, label: 'HOURS'},
+                            {val: timeLeft.minutes, label: 'MIN'},
+                            {val: timeLeft.seconds, label: 'SEC'}
+                        ].map((item, idx) => (
+                            <div key={idx} className="minimal-item">
+                                <div className="minimal-num">{item.val}</div>
+                                <div className="minimal-label">{item.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* 4. 갤러리 색션 */}
+            <section className="gallery">
+                <h2 className="section-title serif fade-in">사진첩</h2>
+                <div className="gallery-grid fade-in">
+                    {displayedPhotos.map((src, index) => {
+                        const patterns = ["tall", "", "", "wide"];
+                        const styleClass = patterns[index % 4];
+
+                        return (
+                            <img
+                                key={index}
+                                src={src}
+                                alt="웨딩"
+                                className={styleClass} // 자동 할당된 클래스 사용
+                                loading="lazy"
+                                onClick={() => setCurrentIndex(index)}
+                            />
+                        );
+                    })}
+                </div>
+
+                {/* 사진이 8장보다 많고, 아직 다 펼치지 않았을 때만 버튼 노출 */}
+                {!showAll && photoList.length > 8 && (
+                    <button className="more-btn" onClick={() => setShowAll(true)}>
+                        사진 더보기 +
+                    </button>
+                )}
+            </section>
+
+            {/* 사진 클릭 시 나타나는 확대 모달 */}
+            {currentIndex !== null && (
+                <div className="modal" onClick={() => setCurrentIndex(null)}>
+                    {/* 닫기 버튼 추가 */}
+                    <button className="close-btn" onClick={() => setCurrentIndex(null)}>×</button>
+                    <button className="nav-btn prev" onClick={handlePrev}>&lt;</button>
+                    <img src={photoList[currentIndex]} alt="확대사진" onClick={(e) => e.stopPropagation()}/>
+                    <button className="nav-btn next" onClick={handleNext}>&gt;</button>
+                </div>
+            )}
+
+            {/* 5. 지도 섹션 */}
+            <section className="location">
+                <div className="fade-in">
+                    <h2 className="section-title serif">오시는 길</h2>
+                    <div className="map-container">
+                        <Map/>
+                    </div>
+
+                    {/* 길 안내 버튼 (지도 앱으로 연결) */}
+                    <div className="button-group">
+                        <a href="https://naver.me/56X9I9Zl" className="map-btn naver">네이버 지도</a>
+                        <a href="https://place.map.kakao.com/26887653?fromAppLink=true"
+                           className="map-btn kakao">카카오맵</a>
+                        <a href="https://tmap.life/a1bd696f" className="map-btn tMap">티맵</a>
+                    </div>
+                </div>
+
+                <div className="traffic-info fade-in">
+                    <h3><FaSubway style={{marginRight: '8px'}}/>지하철</h3>
+                    <p>
+                        <LineIcon line="3" color="#ff7f00"/>
+                        <LineIcon line="4" color="#2ca4d8"/>
+                        <strong>충무로역</strong>&nbsp;&nbsp;|&nbsp;&nbsp;8번 출구에서 도보 5분
+                    </p>
+                    <p>
+                        <LineIcon line="2" color="#3cb44a"/>
+                        <LineIcon line="5" color="#9932cc"/>
+                        <strong>을지로4가역</strong>&nbsp;&nbsp;|&nbsp;&nbsp;10번 출구에서 도보 4분
+                    </p>
+
+                    <h3><FaBus style={{marginRight: '8px'}}/>버스</h3>
+                    <p><strong>을지로4가 방면</strong>&nbsp;&nbsp;|&nbsp;&nbsp;100, 105, 152, 202, 261, 604, 7011</p>
+                    <p><strong>퇴계로 방면</strong>&nbsp;&nbsp;|&nbsp;&nbsp; 104, 105, 140, 463, 421, 507, 604, 7011</p>
+
+                    <h3><FaShuttleVan style={{marginRight: '8px'}}/>셔틀버스</h3>
+                    <p>예식 1시간 전부터 10~15분 간격 왕복 운행</p>
+                    <p className="notice">* 운영 시간 및 간격은 예식 상황에 따라 변동될 수 있습니다.</p>
+                    <p><LineIcon line="3" color="#ff7f00"/>
+                        <LineIcon line="4" color="#2ca4d8"/>
+                        <strong>충무로역</strong> 8번 출구 앞 탑승</p>
+                    <p><LineIcon line="2" color="#3cb44a"/>
+                        <LineIcon line="5" color="#9932cc"/>
+                        <strong>을지로4가역</strong> 9번 출구 GS25(편의점) 골목에서 탑승</p>
+                </div>
+            </section>
+
+            {/* 6. 계좌번호 섹션 */}
+            <section className="account fade-in">
+                <h2 className="section-title serif">마음 전하실 곳</h2>
+                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. 너른 양해 부탁드립니다.</p>
+
+                {/* 신랑측 */}
+                <button className="btn-toggle" onClick={() => setIsGroomAccountOpen(!isGroomAccountOpen)}>
+                    신랑측 혼주 계좌번호 보기 {isGroomAccountOpen ? '▲' : '▼'}
+                </button>
+                {isGroomAccountOpen && (
+                    <>
+                        <div className="account-details">
+                            <p><strong>신한은행</strong> 110-004-756070</p>
+                            <div className="bank-flex">
+                                <span>예금주 : 이득선</span>
+                                <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
+                            </div>
+                        </div>
+                        <div className="account-details">
+                            <p><strong>농협은행</strong> 177074-56-129421</p>
+                            <div className="bank-flex">
+                                <span>예금주 : 김해례</span>
+                                <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* 신부측 */}
+                <button className="btn-toggle" onClick={() => setIsBrideAccountOpen(!isBrideAccountOpen)}
+                        style={{marginTop: '10px'}}>
+                    신부측 혼주 계좌번호 보기 {isBrideAccountOpen ? '▲' : '▼'}
+                </button>
+                {isBrideAccountOpen && (
+                    <>
+                        <div className="account-details">
+                            <p><strong>국민은행</strong> 288002-04-019125</p>
+                            <div className="bank-flex">
+                                <span>예금주 : 이흥배</span>
+                                <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
+                            </div>
+                        </div>
+                        <div className="account-details">
+                            <p><strong>국민은행</strong> 288002-04-019125</p>
+                            <div className="bank-flex">
+                                <span>예금주 : 오민자</span>
+                                <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </section>
+
+            {/* 6. 방명록 */}
+            <section className="guestbook">
+                <h2 className="section-title serif fade-in">방명록</h2>
+                {/* 1) 방명록 작성 폼 (메인 노출) */}
+                <div className="guestbook-form fade-in">
+                    <div className="form-inputs">
+                        <input
+                            type="text"
+                            placeholder="이름"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            maxLength={10}
+                        />
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            maxLength={10}
+                        />
+                    </div>
+                    <textarea
+                        placeholder="축하 메시지를 남겨주세요."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        maxLength={200}
+                    />
+                    <button className="btn-submit" onClick={handleSubmit}>등록하기</button>
+                </div>
+
+                {/* 2) 메인 리스트 (최신 3개만 노출) */}
+                <div className="guestbook-list fade-in">
+                    {entries.slice(0, 3).map((entry: any) => (
+                        <div key={entry.id} className="guestbook-item">
+                            <div className="item-header">
+                                <span className="name"><strong>{entry.name}</strong></span>
+                                <div className="item-right">
+                                    <span className="date">{formatDate(entry.date)}</span>
+                                    <button className="btn-delete"
+                                            onClick={() => handleDelete(entry.id, entry.password)}>✕
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="message">{entry.message}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 3) 전체보기 버튼 */}
+                <button className="btn-view-all fade-in" onClick={() => setIsAllModalOpen(true)}>
+                    전체보기
+                </button>
+
+                {/* 4) 방명록 전체보기 모달 */}
+                {isAllModalOpen && (
+                    <div className="modal-overlay" onClick={() => setIsAllModalOpen(false)}>
+                        <div className="modal-content all-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h3>방명록 전체보기</h3>
+                                <button className="btn-close" onClick={() => setIsAllModalOpen(false)}>✕</button>
+                            </div>
+
+                            <div className="modal-body scrollable">
+                                {entries.length === 0 ? (
+                                    // 작성된 방명록이 없을 때의 빈 화면
+                                    <div className="empty-state">
+                                        <p>아직 작성된 방명록이 없습니다.<br/>첫 방명록을 작성해주세요.</p>
+                                        <button className="btn-empty-write"
+                                                onClick={() => setIsAllModalOpen(false)}>작성하기
+                                        </button>
+                                    </div>
+                                ) : (
+                                    // 작성된 방명록이 있을 때의 리스트와 페이징
+                                    <>
+                                        {currentItems.map((entry: any) => (
+                                            <div key={entry.id} className="guestbook-item">
+                                                <div className="item-header">
+                                                    <span className="name"><strong>{entry.name}</strong></span>
+                                                    <div className="item-right">
+                                                        <span className="date">{formatDate(entry.date)}</span>
+                                                        <button className="btn-delete"
+                                                                onClick={() => handleDelete(entry.id, entry.password)}>✕
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p className="message">{entry.message}</p>
+                                            </div>
+                                        ))}
+
+                                        {/* 페이징 버튼 */}
+                                        <div className="pagination">
+                                            {Array.from({length: totalPages}, (_, i) => (
+                                                <button
+                                                    key={i + 1}
+                                                    className={currentPage === i + 1 ? 'active' : ''}
+                                                    onClick={() => setCurrentPage(i + 1)}
+                                                >
+                                                    {i + 1}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </section>
+
+            {/* 하단 네비게이션 바 */}
+            <div className="floating-buttons">
+                <button className="float-btn" onClick={toggleAudio}>
+                    {isPlaying ? <FaMusic/> : <FaVolumeMute/>}
+                </button>
+                <button onClick={scrollToTop} className="float-btn">
+                    <FaArrowUp/>
+                </button>
+                <button onClick={handleShare} className="float-btn">
+                    <FaShareAlt/>
+                </button>
+            </div>
+
+            {/* 하단 D-day */}
+            <section className="together-section fade-in">
+                <p className="section-title serif">함께한 시간</p>
+                <p className="together-time">
+                    "{elapsedTime.years}년 {elapsedTime.days}일 {elapsedTime.hours}시간 {elapsedTime.minutes}분 {elapsedTime.seconds}초"
+                </p>
+            </section>
+            <section className="closing-image-section fade-in">
+                <div className="closing-wrapper">
+                    {/* 💡 마지막으로 들어갈 예쁜 사진 경로로 변경해 주세요 */}
+                    <img
+                        src="https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_02_w51kho.jpg"
+                        alt="행복하게 잘 살겠습니다" className="closing-image"/>
+                </div>
+            </section>
+
+            <footer className="copyright">
+                COPYRIGHT LEEHYEKYUNG. All rights reserved. <br/>
+                Music by <a
+                href="https://pixabay.com/ko/users/paulyudin-27739282/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=160693"
+                target="_blank" rel="noreferrer">Pavel Bekirov</a> from <a
+                href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=160693"
+                target="_blank" rel="noreferrer">Pixabay</a>
+            </footer>
+        </div>
+    );
+}
+
+export default ParentApp

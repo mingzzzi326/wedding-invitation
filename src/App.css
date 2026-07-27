@@ -51,6 +51,17 @@ section {
 }
 section:last-child { border-bottom: none; }
 
+/* 모든 이미지에 드래그 및 선택 방지 적용 */
+img {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none; /* 핵심: 브라우저 기본 드래그 차단 */
+  -webkit-touch-callout: none; /*아이폰 차단*/
+}
+
 .cover {
   padding: 0 !important; /* cover 섹션은 패딩을 없애고 내부 요소들이 알아서 패딩을 갖게 함 */
   border-bottom: 1px solid var(--line-color);
@@ -199,22 +210,74 @@ section:last-child { border-bottom: none; }
 }
 
 .countdown { margin-top: 40px; font-size: 0.9rem; color: #777; }
-.time-box { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-.time-box span { display: flex; flex-direction: column; font-size: 0.7rem; color: #999; }
-.time-box b { font-size: 1.2rem; color: #333; }
+.minimal-grid {
+  display: flex;
+  justify-content: space-between; /* 각 요소 사이의 공간을 균등하게 분배 */
+  align-items: center;
+  margin-top: 25px;
+  width: 100%;
+}
+.minimal-item {
+  flex: 1; /* 핵심: 모든 항목이 동일한 비율로 너비를 가짐 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid #EFEAE6; /* 부드러운 구분선 */
+  padding: 10px 0;
+}
+.minimal-item:last-child {
+  border-right: none;
+}
+.minimal-num {
+  font-size: 1.5rem;
+  font-family: 'Nanum Myeongjo', serif;
+  font-weight: bold;
+  color: #3A3432;
+}
+.minimal-label {
+  font-size: 0.7rem;
+  color: #8B8280;
+  letter-spacing: 1px;
+  margin-top: 8px; /* 숫자와 라벨 사이 간격 */
+}
 
 /* 갤러리 그리드 */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr); /* 2열 고정 */
+  grid-auto-rows: 130px;
+  gap: 8px;
+  grid-auto-flow: dense;
 }
+
 .gallery-grid img {
   width: 100%;
-  aspect-ratio: 1/1; /* 정사각형 비율 */
+  height: 100%;
   object-fit: cover;
+  object-position: 50% 43%;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* 잡지식 구성 클래스 */
+.tall { grid-row: span 2; }    /* 세로로 2칸 */
+.wide { grid-column: span 2; } /* 가로로 2칸 */
+.big  { grid-row: span 2; grid-column: span 2; } /* 2x2 사이즈 */
+
+.more-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 25px;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.more-btn:hover {
+  background-color: #f0f0f0;
 }
 
 /* 확대 모달 */
@@ -716,4 +779,24 @@ section:last-child { border-bottom: none; }
   background-color: transparent;
   letter-spacing: 0.5px; /* 글자 사이 간격을 살짝 넓혀서 깔끔하게 */
   font-family: Arial, Helvetica, sans-serif; /* 영문이 예쁘게 나오는 기본 폰트 적용 */
+}
+
+/* BGM 버튼 스타일 */
+.bgm-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999; /* 화면 최상단에 배치 */
+  padding: 10px 18px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background 0.3s;
+}
+
+.bgm-btn:hover {
+  background-color: #fff;
 }

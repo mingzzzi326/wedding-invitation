@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { db } from './firebase';
 import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'firebase/firestore';
 import './App.css'
@@ -6,9 +6,10 @@ import Map from './map.tsx';
 //아이콘
 import { FaSubway, FaBus, FaShuttleVan } from 'react-icons/fa';
 //네비게이션
-import { FaShareAlt, FaArrowUp } from 'react-icons/fa';
+import {FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute} from 'react-icons/fa';
 
 function App() {
+
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isGroomAccountOpen, setIsGroomAccountOpen] = useState<boolean>(false);
   const [isBrideAccountOpen, setIsBrideAccountOpen] = useState<boolean>(false);
@@ -20,20 +21,36 @@ function App() {
     "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00605_s9qdo7.jpg",
     "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00783_tjdahw.jpg",
     "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00803_ip0cqs.jpg",
-    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01038_1_suporu.jpg",
-    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01213_1_cxlylw.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00699_kzpqeq.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00261_dmjpqm.jpg",
     "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_01_qqjl12.jpg",
     "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/KakaoTalk_20260718_155451822_s7tofm.jpg",
-    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985134/DSC00261_dmjpqm.jpg",
-    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC00699_kzpqeq.jpg"
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01213_1_cxlylw.jpg",
+    "https://res.cloudinary.com/g2ipdqwy/image/upload/v1784985135/DSC01038_1_suporu.jpg"
   ];
-
+  // App 컴포넌트 상단에 추가
+  const [showAll, setShowAll] = useState(false);
+// 8장만 보여줄지, 전체를 보여줄지 결정하는 리스트 생성
+  const displayedPhotos = showAll ? photoList : photoList.slice(0, 7);
   //갤러리
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
   // 갤러리 - 버튼 클릭 시 인덱스 조절 함수
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     setCurrentIndex((prev) => (prev !== null ? (prev - 1 + photoList.length) % photoList.length : null));
+  };
+
+// 음악 재생 상태 관리
+  const [isPlaying, setIsPlaying] = useState(false);
+  // Audio 객체 생성 (CDN 주소를 여기에 입력하세요)
+  const audioRef = useRef(new Audio("https://res.cloudinary.com/g2ipdqwy/video/upload/v1785050702/paulyudin-story-160693_g7vavm.mp3"));
+  const toggleAudio = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   const handleNext = (e: React.MouseEvent) => {
@@ -203,6 +220,16 @@ function App() {
     const fadeElements = document.querySelectorAll('.fade-in');
     fadeElements.forEach((el) => observer.observe(el));
 
+    const handleContextMenu = (e: MouseEvent) => {
+      // 우클릭한 대상이 이미지(HTMLImageElement)인 경우에만 차단
+      if (e.target instanceof HTMLImageElement) {
+        e.preventDefault();
+      }
+    };
+
+    // 마우스 우클릭 이벤트 리스너 추가
+    document.addEventListener('contextmenu', handleContextMenu);
+
     // 2. 카운트다운 타이머
     const weddingDate = new Date('2026-10-24T11:00:00');
     const countdownTimer = setInterval(() => {
@@ -340,11 +367,18 @@ function App() {
 
           <div className="countdown fade-in">
             <p>희민 ❤ 혜경 결혼식까지</p>
-            <div className="time-box">
-              <span><b>{timeLeft.days}</b>DAYS</span>
-              <span><b>{timeLeft.hours}</b>HOURS</span>
-              <span><b>{timeLeft.minutes}</b>MIN</span>
-              <span><b>{timeLeft.seconds}</b>SEC</span>
+            <div className="minimal-grid">
+              {[
+                { val: timeLeft.days, label: 'DAYS' },
+                { val: timeLeft.hours, label: 'HOURS' },
+                { val: timeLeft.minutes, label: 'MIN' },
+                { val: timeLeft.seconds, label: 'SEC' }
+              ].map((item, idx) => (
+                  <div key={idx} className="minimal-item">
+                    <div className="minimal-num">{item.val}</div>
+                    <div className="minimal-label">{item.label}</div>
+                  </div>
+              ))}
             </div>
           </div>
         </section>
@@ -353,16 +387,29 @@ function App() {
         <section className="gallery">
           <h2 className="section-title serif fade-in">GALLERY</h2>
           <div className="gallery-grid fade-in">
-            {photoList.map((src, index) => (
-                <img
-                    key={index}
-                    src={src}
-                    alt="웨딩"
-                    loading="lazy"
-                    onClick={() => setCurrentIndex(index)} // 인덱스 저장
-                />
-            ))}
+            {displayedPhotos.map((src, index) => {
+              const patterns = ["tall", "", "", "wide"];
+              const styleClass = patterns[index % 4];
+
+              return (
+                  <img
+                      key={index}
+                      src={src}
+                      alt="웨딩"
+                      className={styleClass} // 자동 할당된 클래스 사용
+                      loading="lazy"
+                      onClick={() => setCurrentIndex(index)}
+                  />
+              );
+            })}
           </div>
+
+          {/* 사진이 8장보다 많고, 아직 다 펼치지 않았을 때만 버튼 노출 */}
+          {!showAll && photoList.length > 8 && (
+              <button className="more-btn" onClick={() => setShowAll(true)}>
+                사진 더보기 +
+              </button>
+          )}
         </section>
 
         {/* 사진 클릭 시 나타나는 확대 모달 */}
@@ -432,9 +479,9 @@ function App() {
           </button>
           {isGroomAccountOpen && (
               <div className="account-details">
-                <p><strong>국민은행</strong> 123456-78-901234</p>
+                <p><strong>국민은행</strong> 620002-04-125116</p>
                 <div className="bank-flex">
-                  <span>예금주: 이희민</span>
+                  <span>예금주 : 이희민</span>
                   <button className="btn-copy" onClick={() => copyText('12345678901234')}>복사</button>
                 </div>
               </div>
@@ -446,9 +493,9 @@ function App() {
           </button>
           {isBrideAccountOpen && (
               <div className="account-details">
-                <p><strong>국민은행</strong> 110-123-456789</p>
+                <p><strong>국민은행</strong> 318002-04-150552</p>
                 <div className="bank-flex">
-                  <span>예금주: 이혜경</span>
+                  <span>예금주 : 이혜경</span>
                   <button className="btn-copy" onClick={() => copyText('110123456789')}>복사</button>
                 </div>
               </div>
@@ -560,6 +607,9 @@ function App() {
 
         {/* 하단 네비게이션 바 */}
         <div className="floating-buttons">
+          <button className="float-btn" onClick={toggleAudio}>
+            {isPlaying ? <FaMusic /> : <FaVolumeMute />}
+          </button>
           <button onClick={scrollToTop} className="float-btn">
             <FaArrowUp />
           </button>
@@ -570,7 +620,7 @@ function App() {
 
         {/* 하단 D-day */}
         <section className="together-section fade-in">
-          <p className="together-title">함께한 시간</p>
+          <p className="section-title serif">함께한 시간</p>
           <p className="together-time">
             "{elapsedTime.years}년 {elapsedTime.days}일 {elapsedTime.hours}시간 {elapsedTime.minutes}분 {elapsedTime.seconds}초"
           </p>
@@ -583,7 +633,8 @@ function App() {
         </section>
 
         <footer className="copyright">
-          COPYRIGHT LEEHYEKYUNG. All rights reserved.
+          COPYRIGHT LEEHYEKYUNG. All rights reserved. <br/>
+          Music by <a href="https://pixabay.com/ko/users/paulyudin-27739282/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=160693" target="_blank" rel="noreferrer">Pavel Bekirov</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=160693" target="_blank" rel="noreferrer">Pixabay</a>
         </footer>
       </div>
   );
