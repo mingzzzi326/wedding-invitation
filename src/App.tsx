@@ -4,7 +4,8 @@ import {collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'fireb
 import './App.css'
 import Map from './map.tsx';
 //아이콘
-import {FaSubway, FaBus, FaShuttleVan, FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
+import {FaSubway, FaBus, FaShuttleVan, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
+import kakaoIcon from './assets/kakaotalk_btn.png';
 import {AnimatePresence, motion} from "framer-motion";
 
 function App() {
@@ -639,8 +640,8 @@ function App() {
                 <button onClick={scrollToTop} className="float-btn">
                     <FaArrowUp/>
                 </button>
-                <button onClick={handleShare} className="float-btn">
-                    <FaShareAlt/>
+                <button className="float-btn" onClick={handleShare}>
+                    <img src={kakaoIcon} alt="공유하기" />
                 </button>
             </div>
 

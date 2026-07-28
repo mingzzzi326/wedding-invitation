@@ -886,7 +886,6 @@ body {
     }
 
     /* 네비게이션 */
-
     .floating-buttons {
         position: fixed;
         bottom: 30px;
@@ -908,8 +907,8 @@ body {
     }
 
     .float-btn {
-        width: 48px;
-        height: 48px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         border: none;
         background-color: rgba(140, 130, 125, 0.4); /* 고급스러운 반투명 웜그레이 */
@@ -923,9 +922,16 @@ body {
         transition: background-color 0.3s ease;
         font-size: 1.2rem; /* react-icons 크기 조절 */
     }
-
     .float-btn:hover {
         background-color: rgba(140, 130, 125, 0.6);
+    }
+
+    /* 버튼 안의 이미지 스타일 */
+    .float-btn img {
+        width: 50%; /* 버튼 크기에 맞춰 적절히 조절 */
+        height: 50%;
+        object-fit: contain;
+        pointer-events: none; /* 클릭 이벤트가 버튼으로 전달되도록 설정 */
     }
 
     .copyright {

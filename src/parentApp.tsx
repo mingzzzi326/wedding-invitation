@@ -3,8 +3,9 @@ import {db} from './firebase';
 import {collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'firebase/firestore';
 import './parentApp.css'
 import Map from './map.tsx';
+import kakaoIcon from './assets/kakaotalk_btn.png';
 //아이콘
-import {FaSubway, FaBus, FaShuttleVan, FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
+import {FaSubway, FaBus, FaShuttleVan, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
 
 //fade 효과
 import { motion, AnimatePresence } from 'framer-motion';
@@ -369,10 +370,10 @@ function ParentApp() {
                     <p>희민 ❤ 혜경 결혼식까지</p>
                     <div className="minimal-grid">
                         {[
-                            {val: timeLeft.days, label: 'DAYS'},
-                            {val: timeLeft.hours, label: 'HOURS'},
-                            {val: timeLeft.minutes, label: 'MIN'},
-                            {val: timeLeft.seconds, label: 'SEC'}
+                            {val: timeLeft.days, label: '일'},
+                            {val: timeLeft.hours, label: '시'},
+                            {val: timeLeft.minutes, label: '분'},
+                            {val: timeLeft.seconds, label: '초'}
                         ].map((item, idx) => (
                             <div key={idx} className="minimal-item">
                                 <div className="minimal-num">{item.val}</div>
@@ -662,8 +663,8 @@ function ParentApp() {
                 <button onClick={scrollToTop} className="float-btn">
                     <FaArrowUp/>
                 </button>
-                <button onClick={handleShare} className="float-btn">
-                    <FaShareAlt/>
+                <button className="float-btn" onClick={handleShare}>
+                    <img src={kakaoIcon} alt="공유하기" />
                 </button>
             </div>
 
