@@ -4,9 +4,7 @@ import {collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'fireb
 import './App.css'
 import Map from './map.tsx';
 //아이콘
-import {FaSubway, FaBus, FaShuttleVan} from 'react-icons/fa';
-//네비게이션
-import {FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute} from 'react-icons/fa';
+import {FaSubway, FaBus, FaShuttleVan, FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
 import {AnimatePresence, motion} from "framer-motion";
 
 function App() {
@@ -310,13 +308,15 @@ function App() {
             {/* 2. 인사말 섹션 */}
             <section className="greeting">
                 <h2 className="section-title serif fade-in">INVITATION</h2>
-                <p className="greeting-text serif fade-in">
-                    서로가 마주 보며 다져온 사랑을<br/>
-                    이제 함께 한 곳을 바라보며<br/>
-                    걸어갈 수 있는 큰 사랑으로 키우고자 합니다.<br/><br/>
-                    따뜻한 파스텔빛 가을날,<br/>
-                    저희 두 사람의 출발을<br/>
-                    축복해 주시면 감사하겠습니다.
+                <p className="greeting-text fade-in">
+                    한 사람의 하루가<br/>
+                    다른 한 사람의 안식이 되고,<br/>
+                    서로의 평범한 날들이<br/>
+                    가장 소중한 순간이 되었습니다.<br/><br/>
+                    이제 서로의 곁에서<br/>
+                    앞으로의 모든 날을 함께하려 합니다.<br/>
+                    저희 두 사람의 새로운 시작을<br/>
+                    따뜻한 마음으로 축복해 주세요.
                 </p>
                 <div className="profile-container fade-in">
                     {/* 신랑 */}
@@ -489,33 +489,34 @@ function App() {
             {/* 6. 계좌번호 섹션 */}
             <section className="account fade-in">
                 <h2 className="section-title serif">ACCOUNT</h2>
-                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. 넓은 마음으로 이해해 주시길 부탁드립니다.</p>
+                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. <br/>넓은 마음으로 이해해 주시길 부탁드립니다.</p>
 
                 {/* 신랑측 */}
                 <button className="btn-toggle" onClick={() => setIsGroomAccountOpen(!isGroomAccountOpen)}>
-                    신랑측 계좌번호 보기 {isGroomAccountOpen ? '▲' : '▼'}
+                    <span>신랑측 계좌번호 보기</span>
+                    {isGroomAccountOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </button>
                 {isGroomAccountOpen && (
                     <div className="account-details">
                         <p><strong>국민은행</strong> 620002-04-125116</p>
                         <div className="bank-flex">
                             <span>예금주 : 이희민</span>
-                            <button className="btn-copy" onClick={() => copyText('62000204125116')}>복사</button>
+                            <button className="btn-copy" onClick={() => copyText('국민은행 62000204125116')}>복사</button>
                         </div>
                     </div>
                 )}
 
                 {/* 신부측 */}
-                <button className="btn-toggle" onClick={() => setIsBrideAccountOpen(!isBrideAccountOpen)}
-                        style={{marginTop: '10px'}}>
-                    신부측 계좌번호 보기 {isBrideAccountOpen ? '▲' : '▼'}
+                <button className="btn-toggle" onClick={() => setIsBrideAccountOpen(!isBrideAccountOpen)} style={{marginTop: '10px'}}>
+                    <span>신부측 계좌번호 보기</span>
+                    {isGroomAccountOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </button>
                 {isBrideAccountOpen && (
                     <div className="account-details">
                         <p><strong>국민은행</strong> 318002-04-150552</p>
                         <div className="bank-flex">
                             <span>예금주 : 이혜경</span>
-                            <button className="btn-copy" onClick={() => copyText('31800204150552')}>복사</button>
+                            <button className="btn-copy" onClick={() => copyText('국민은행 31800204150552')}>복사</button>
                         </div>
                     </div>
                 )}

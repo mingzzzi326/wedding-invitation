@@ -4,9 +4,8 @@ import {collection, addDoc, getDocs, query, orderBy, deleteDoc, doc} from 'fireb
 import './parentApp.css'
 import Map from './map.tsx';
 //아이콘
-import {FaSubway, FaBus, FaShuttleVan} from 'react-icons/fa';
-//네비게이션
-import {FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute} from 'react-icons/fa';
+import {FaSubway, FaBus, FaShuttleVan, FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute, FaChevronUp, FaChevronDown} from 'react-icons/fa';
+
 //fade 효과
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -314,13 +313,15 @@ function ParentApp() {
             {/* 2. 인사말 섹션 */}
             <section className="greeting">
                 <h2 className="section-title serif fade-in">초대합니다</h2>
-                <p className="greeting-text serif fade-in">
-                    서로가 마주 보며 다져온 사랑을<br/>
-                    이제 함께 한 곳을 바라보며<br/>
-                    걸어갈 수 있는 큰 사랑으로 키우고자 합니다.<br/><br/>
-                    따뜻한 파스텔빛 가을날,<br/>
-                    저희 두 사람의 출발을<br/>
-                    축복해 주시면 감사하겠습니다.
+                <p className="greeting-text fade-in">
+                    한 사람의 하루가<br/>
+                    다른 한 사람의 안식이 되고,<br/>
+                    서로의 평범한 날들이<br/>
+                    가장 소중한 순간이 되었습니다.<br/><br/>
+                    이제 서로의 곁에서<br/>
+                    앞으로의 모든 날을 함께하려 합니다.<br/>
+                    저희 두 사람의 새로운 시작을<br/>
+                    따뜻한 마음으로 축복해 주세요.
                 </p>
                 <div className="profile-container fade-in">
                     {/* 신랑 */}
@@ -493,11 +494,12 @@ function ParentApp() {
             {/* 6. 계좌번호 섹션 */}
             <section className="account fade-in">
                 <h2 className="section-title serif">마음 전하실 곳</h2>
-                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. 넓은 마음으로 이해해 주시길 부탁드립니다.</p>
+                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. <br/>넓은 마음으로 이해해 주시길 부탁드립니다.</p>
 
                 {/* 신랑측 */}
                 <button className="btn-toggle" onClick={() => setIsGroomAccountOpen(!isGroomAccountOpen)}>
-                    신랑측 혼주 계좌번호 보기 {isGroomAccountOpen ? '▲' : '▼'}
+                    <span>신랑측 혼주 계좌번호 보기</span>
+                    {isGroomAccountOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </button>
                 {isGroomAccountOpen && (
                     <>
@@ -505,23 +507,23 @@ function ParentApp() {
                             <p><strong>신한은행</strong> 110-004-756070</p>
                             <div className="bank-flex">
                                 <span>예금주 : 이득선</span>
-                                <button className="btn-copy" onClick={() => copyText('110004756070')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('신한은행 110004756070')}>복사</button>
                             </div>
                         </div>
                         <div className="account-details">
                             <p><strong>농협은행</strong> 177074-56-129421</p>
                             <div className="bank-flex">
                                 <span>예금주 : 김해례</span>
-                                <button className="btn-copy" onClick={() => copyText('17707456129421')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('농협은행 17707456129421')}>복사</button>
                             </div>
                         </div>
                     </>
                 )}
 
                 {/* 신부측 */}
-                <button className="btn-toggle" onClick={() => setIsBrideAccountOpen(!isBrideAccountOpen)}
-                        style={{marginTop: '10px'}}>
-                    신부측 혼주 계좌번호 보기 {isBrideAccountOpen ? '▲' : '▼'}
+                <button className="btn-toggle" onClick={() => setIsBrideAccountOpen(!isBrideAccountOpen)}  style={{marginTop: '10px'}}>
+                    <span>신부측 혼주 계좌번호 보기</span>
+                    {isBrideAccountOpen ? <FaChevronUp /> : <FaChevronDown />}
                 </button>
                 {isBrideAccountOpen && (
                     <>
@@ -529,14 +531,14 @@ function ParentApp() {
                             <p><strong>국민은행</strong> 202-21-0766-895</p>
                             <div className="bank-flex">
                                 <span>예금주 : 이흥배</span>
-                                <button className="btn-copy" onClick={() => copyText('202210766895')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('국민은행 202210766895')}>복사</button>
                             </div>
                         </div>
                         <div className="account-details">
                             <p><strong>국민은행</strong> 288002-04-019125</p>
                             <div className="bank-flex">
                                 <span>예금주 : 오민자</span>
-                                <button className="btn-copy" onClick={() => copyText('28800204019125')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('국민은행 28800204019125')}>복사</button>
                             </div>
                         </div>
                     </>

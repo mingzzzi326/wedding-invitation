@@ -118,9 +118,13 @@ body {
     }
 
     .greeting-text {
-        font-size: 1.2rem; /* 인사말 폰트 키움 */
-        line-height: 2.2;
+        font-family: 'Maru Buri', 'Nanum Myeongjo', serif; /* 마루부리 적용 */
+        letter-spacing: -0.02em;
+        word-break: keep-all;
+        color: #4A4442;
         margin-bottom: 50px;
+        font-size: 1.1rem; /* 인사말 폰트 키움 */
+        line-height: 2.2;
     }
 
     .parents-info {
@@ -155,6 +159,7 @@ body {
         cursor: pointer;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02); /* 버튼에도 미세한 입체감 */
         transition: background-color 0.2s ease;
     }
