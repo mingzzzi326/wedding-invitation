@@ -7,6 +7,8 @@ import Map from './map.tsx';
 import {FaSubway, FaBus, FaShuttleVan} from 'react-icons/fa';
 //네비게이션
 import {FaShareAlt, FaArrowUp, FaMusic, FaVolumeMute} from 'react-icons/fa';
+//fade 효과
+import { motion, AnimatePresence } from 'framer-motion';
 
 function ParentApp() {
 
@@ -33,13 +35,18 @@ function ParentApp() {
     const displayedPhotos = showAll ? photoList : photoList.slice(0, 7);
     //갤러리
     const [currentIndex, setCurrentIndex] = useState<number | null>(null);
-    // 갤러리 - 버튼 클릭 시 인덱스 조절 함수
+    const handleNext = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // 단순히 인덱스만 바꿉니다. DOM 조작은 하지 않습니다.
+        setCurrentIndex((prev) => (prev !== null ? (prev + 1) % photoList.length : null));
+    };
     const handlePrev = (e: React.MouseEvent) => {
         e.stopPropagation();
         setCurrentIndex((prev) => (prev !== null ? (prev - 1 + photoList.length) % photoList.length : null));
     };
 
-// 음악 재생 상태 관리
+
+    // 음악 재생 상태 관리
     const [isPlaying, setIsPlaying] = useState(false);
     // Audio 객체 생성 (CDN 주소를 여기에 입력하세요)
     const audioRef = useRef(new Audio("https://res.cloudinary.com/g2ipdqwy/video/upload/v1785050702/paulyudin-story-160693_g7vavm.mp3"));
@@ -50,18 +57,6 @@ function ParentApp() {
             audioRef.current.play();
         }
         setIsPlaying(!isPlaying);
-    };
-
-    const handleNext = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        // 1. 이미지를 먼저 투명하게(사라지게)
-        const imgElement = document.querySelector('.modal img');
-        imgElement?.classList.add('fade-out');
-        // 2. 0.3초 뒤에 사진을 교체하고 다시 나타나게
-        setTimeout(() => {
-            setCurrentIndex((prev) => (prev !== null ? (prev + 1) % photoList.length : null));
-            imgElement?.classList.remove('fade-out');
-        }, 300);
     };
 
     //방명록
@@ -419,10 +414,32 @@ function ParentApp() {
             {/* 사진 클릭 시 나타나는 확대 모달 */}
             {currentIndex !== null && (
                 <div className="modal" onClick={() => setCurrentIndex(null)}>
-                    {/* 닫기 버튼 추가 */}
                     <button className="close-btn" onClick={() => setCurrentIndex(null)}>×</button>
                     <button className="nav-btn prev" onClick={handlePrev}>&lt;</button>
-                    <img src={photoList[currentIndex]} alt="확대사진" onClick={(e) => e.stopPropagation()}/>
+                    <div className="img-wrapper">
+                        <AnimatePresence mode="wait">
+                            <motion.img
+                                key={currentIndex} // key가 바뀌면 모션이 새로 시작됩니다
+                                src={photoList[currentIndex]}
+                                alt="확대사진"
+                                onClick={(e) => e.stopPropagation()}
+
+                                // 애니메이션 설정
+                                initial={{ opacity: 0 }}   // 나타날 때 상태
+                                animate={{ opacity: 1 }}   // 현재 상태
+                                exit={{ opacity: 0 }}      // 사라질 때 상태
+                                transition={{ duration: 0.3 }} // 0.3초 동안 페이드 효과
+                            />
+                        </AnimatePresence>
+                    </div>
+
+                    {/* 숫자 카운터 영역 */}
+                    <div className="modal-footer">
+                        <span className="counter">
+                            {currentIndex + 1} / {photoList.length}
+                        </span>
+                    </div>
+
                     <button className="nav-btn next" onClick={handleNext}>&gt;</button>
                 </div>
             )}
@@ -476,7 +493,7 @@ function ParentApp() {
             {/* 6. 계좌번호 섹션 */}
             <section className="account fade-in">
                 <h2 className="section-title serif">마음 전하실 곳</h2>
-                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. 너른 양해 부탁드립니다.</p>
+                <p className="account-desc">참석이 어려우신 분들을 위해<br/>계좌번호를 기재하였습니다. 넓은 마음으로 이해해 주시길 부탁드립니다.</p>
 
                 {/* 신랑측 */}
                 <button className="btn-toggle" onClick={() => setIsGroomAccountOpen(!isGroomAccountOpen)}>
