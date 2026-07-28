@@ -302,7 +302,7 @@ function App() {
                 {/* 2. 정보 섹션 (영상 아래) */}
                 <div className="cover-info-section fade-in">
                     <h1 className="title serif">희민 & 혜경</h1>
-                    <p className="date">2026. 10. 24. SAT AM 11:00<br/>서울 중구 마른내로 71 호텔PJ</p>
+                    <p className="date">2026. 10. 24. SAT AM 11:00<br/>서울 중구 마른내로 71 호텔PJ 4층, 헤스티아 홀</p>
                 </div>
             </section>
 
