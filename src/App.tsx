@@ -445,6 +445,7 @@ function App() {
             <section className="location">
                 <div className="fade-in">
                     <h2 className="section-title serif">LOCATION</h2>
+                    <p className="map-desc">서울 중구 마른내로 71&nbsp;&nbsp;&nbsp;<b>호텔PJ 4층, 헤스티아 홀</b></p>
                     <div className="map-container">
                         <Map/>
                     </div>

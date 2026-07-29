@@ -490,6 +490,12 @@ img {
     margin-top: 20px;
 }
 
+.map-desc {
+    font-size: 1.0rem;
+    color: var(--text-sub);
+    margin-bottom: 50px;
+}
+
 .map-btn {
     padding: 10px 20px;
     border: 1px solid #d1d1d1; /* 얇고 연한 테두리 */
