@@ -516,7 +516,7 @@ function ParentApp() {
                             <p><strong>농협은행</strong> 177074-56-129421</p>
                             <div className="bank-flex">
                                 <span>예금주 : 김해례</span>
-                                <button className="btn-copy" onClick={() => copyText('농협은행 17707456129421')}>복사</button>
+                                <button className="btn-copy" onClick={() => copyText('농협은행 71707456129421')}>복사</button>
                             </div>
                         </div>
                     </>
